@@ -4,38 +4,18 @@ local M = {}
 
 vim.b.input_toggle_flag = false
 
-local fcitx_cmd = ""
-if vfn.executable("fcitx-remote") == 1 then
-    fcitx_cmd = "fcitx-remote"
-elseif vfn.executable("fcitx5-remote") == 1 then
-    fcitx_cmd = "fcitx5-remote"
-else
-    return
-end
-
-if os.getenv("SSH_TTY") ~= nil then
-    return
-end
-
-local os_name = vim.uv.os_uname().sysname
-if
-    (os_name == "Linux" or os_name == "Unix")
-    and os.getenv("DISPLAY") == nil
-    and os.getenv("WAYLAND_DISPLAY") == nil
-then
-    return
-end
+local input_cmd = "fcitx5-remote"
 
 local function switch_to_en()
-    vfn.system(fcitx_cmd .. " -c")
+    vfn.system(input_cmd .. " -c")
 end
 
 local function switch_no_latin()
-    vfn.system(fcitx_cmd .. " -o")
+    vfn.system(input_cmd .. " -o")
 end
 
 local function is_no_latin()
-    local input_status = tonumber(vfn.system(fcitx_cmd))
+    local input_status = tonumber(vfn.system(input_cmd))
     return input_status == 2
 end
 
@@ -86,8 +66,6 @@ function M.auto_cmds()
         pattern = { "[/\\?]" },
         callback = switch_normal_do,
     })
-
-    print("test====")
 end
 
 return M
