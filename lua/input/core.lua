@@ -1,5 +1,7 @@
 local api, vfn = vim.api, vim.fn
 
+local M = {}
+
 vim.b.input_toggle_flag = false
 
 local fcitx_cmd = ""
@@ -60,26 +62,32 @@ local function switch_insert_do()
     end
 end
 
-local fc = api.nvim_create_augroup("fcitx", { clear = false })
+function M.auto_cmds()
+    local fc = api.nvim_create_augroup("fcitx", { clear = false })
 
-api.nvim_create_autocmd({ "InsertEnter" }, {
-    group = fc,
-    pattern = { "*" },
-    callback = switch_insert_do,
-})
-api.nvim_create_autocmd({ "InsertLeave" }, {
-    group = fc,
-    pattern = { "*" },
-    callback = switch_normal_do,
-})
+    api.nvim_create_autocmd({ "InsertEnter" }, {
+        group = fc,
+        pattern = { "*" },
+        callback = switch_insert_do,
+    })
+    api.nvim_create_autocmd({ "InsertLeave" }, {
+        group = fc,
+        pattern = { "*" },
+        callback = switch_normal_do,
+    })
 
-api.nvim_create_autocmd({ "CmdlineEnter" }, {
-    group = fc,
-    pattern = { "[/\\?]" },
-    callback = switch_insert_do,
-})
-api.nvim_create_autocmd({ "CmdlineLeave" }, {
-    group = fc,
-    pattern = { "[/\\?]" },
-    callback = switch_normal_do,
-})
+    api.nvim_create_autocmd({ "CmdlineEnter" }, {
+        group = fc,
+        pattern = { "[/\\?]" },
+        callback = switch_insert_do,
+    })
+    api.nvim_create_autocmd({ "CmdlineLeave" }, {
+        group = fc,
+        pattern = { "[/\\?]" },
+        callback = switch_normal_do,
+    })
+
+    print("test====")
+end
+
+return M
