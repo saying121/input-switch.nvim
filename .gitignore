@@ -1,0 +1,18 @@
+### Miscellaneous
+*.log
+logs/*
+nohup.out
+.vale.ini
+styles/
+/.vscode
+.idea
+node_modules/
+silicon-*
+target/
+build_rust/
+build_c_cpp/
+build_go/
+build/
+flamegraph/
+flamegraph.svg
+perf.data*
