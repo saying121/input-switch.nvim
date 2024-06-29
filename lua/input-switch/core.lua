@@ -59,6 +59,19 @@ local function switch_cmd()
 end
 
 function M.auto_cmds()
+    if os.getenv("SSH_TTY") ~= nil then
+        return
+    end
+
+    local os_name = vim.uv.os_uname().sysname
+    if
+        (os_name == "Linux" or os_name == "Unix")
+        and os.getenv("DISPLAY") == nil
+        and os.getenv("WAYLAND_DISPLAY") == nil
+    then
+        return
+    end
+
     local fcitx = api.nvim_create_augroup("FcitxSwitch", { clear = false })
 
     api.nvim_create_autocmd({ "InsertEnter" }, {
