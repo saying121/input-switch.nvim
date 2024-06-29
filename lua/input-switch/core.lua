@@ -23,21 +23,20 @@ local function is_no_en()
 end
 
 local function switch_normal_do()
-    local no_en = is_no_en()
+    local not_en = is_no_en()
 
-    local is_comment = vim.tbl_contains(vim.treesitter.get_captures_at_cursor(), "comment")
-    if no_en and is_comment and config.enable_comment() then
-        switch_to_en()
-    elseif no_en then
+    if not_en then
         switch_to_en()
 
-        vim.b.insert_toggle_flag = true
+        if not vim.tbl_contains(vim.treesitter.get_captures_at_cursor(), "comment") then
+            vim.b.insert_toggle_flag = true
+        end
     end
 end
 local function switch_normal_cmd()
-    local no_latin = is_no_en()
+    local not_en = is_no_en()
 
-    if no_latin then
+    if not_en then
         switch_to_en()
 
         vim.b.cmd_toggle_flag = true
@@ -45,8 +44,7 @@ local function switch_normal_cmd()
 end
 
 local function switch_insert()
-    local is_comment = vim.tbl_contains(vim.treesitter.get_captures_at_cursor(), "comment")
-    if is_comment and config.enable_comment() then
+    if config.enable_comment() and vim.tbl_contains(vim.treesitter.get_captures_at_cursor(), "comment") then
         switch_not_en()
     elseif vim.b.insert_toggle_flag then
         switch_not_en()
@@ -61,26 +59,26 @@ local function switch_cmd()
 end
 
 function M.auto_cmds()
-    local fc = api.nvim_create_augroup("fcitx", { clear = false })
+    local fcitx = api.nvim_create_augroup("FcitxSwitch", { clear = false })
 
     api.nvim_create_autocmd({ "InsertEnter" }, {
-        group = fc,
+        group = fcitx,
         pattern = { "*" },
         callback = switch_insert,
     })
     api.nvim_create_autocmd({ "InsertLeave" }, {
-        group = fc,
+        group = fcitx,
         pattern = { "*" },
         callback = switch_normal_do,
     })
 
     api.nvim_create_autocmd({ "CmdlineEnter" }, {
-        group = fc,
+        group = fcitx,
         pattern = { "[/\\?]" },
         callback = switch_cmd,
     })
     api.nvim_create_autocmd({ "CmdlineLeave" }, {
-        group = fc,
+        group = fcitx,
         pattern = { "[/\\?]" },
         callback = switch_normal_cmd,
     })
