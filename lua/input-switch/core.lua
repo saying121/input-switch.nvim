@@ -2,43 +2,61 @@ local api, vfn = vim.api, vim.fn
 
 local M = {}
 
-vim.b.input_toggle_flag = false
+local config = require("input-switch.config")
+
+vim.b.insert_toggle_flag = false
+vim.b.cmd_toggle_flag = false
 
 local input_cmd = "fcitx5-remote"
 
 local function switch_to_en()
-    vfn.system(input_cmd .. " -c")
+    vfn.system(config.to_en())
 end
 
-local function switch_no_latin()
-    vfn.system(input_cmd .. " -o")
+local function switch_not_en()
+    vfn.system(config.no_en())
 end
 
-local function is_no_latin()
+local function is_no_en()
     local input_status = tonumber(vfn.system(input_cmd))
     return input_status == 2
 end
 
 local function switch_normal_do()
-    local no_latin = is_no_latin()
+    local no_en = is_no_en()
 
     local is_comment = vim.tbl_contains(vim.treesitter.get_captures_at_cursor(), "comment")
-    if no_latin and is_comment then
+    if no_en and is_comment then
         switch_to_en()
-    elseif no_latin then
+    elseif no_en then
         switch_to_en()
 
-        vim.b.input_toggle_flag = true
+        vim.b.insert_toggle_flag = true
+    end
+end
+local function switch_normal_cmd()
+    local no_latin = is_no_en()
+
+    if no_latin then
+        switch_to_en()
+
+        vim.b.cmd_toggle_flag = true
     end
 end
 
-local function switch_insert_do()
+local function switch_insert()
     local is_comment = vim.tbl_contains(vim.treesitter.get_captures_at_cursor(), "comment")
     if is_comment then
-        switch_no_latin()
-    elseif vim.b.input_toggle_flag == true then
-        switch_no_latin()
-        vim.b.input_toggle_flag = false
+        switch_not_en()
+    elseif vim.b.insert_toggle_flag then
+        switch_not_en()
+        vim.b.insert_toggle_flag = false
+    end
+end
+local function switch_cmd()
+    if vim.b.cmd_toggle_flag then
+        switch_not_en()
+        vim.b.cmd_toggle_flag = false
     end
 end
 
@@ -48,7 +66,7 @@ function M.auto_cmds()
     api.nvim_create_autocmd({ "InsertEnter" }, {
         group = fc,
         pattern = { "*" },
-        callback = switch_insert_do,
+        callback = switch_insert,
     })
     api.nvim_create_autocmd({ "InsertLeave" }, {
         group = fc,
@@ -59,12 +77,12 @@ function M.auto_cmds()
     api.nvim_create_autocmd({ "CmdlineEnter" }, {
         group = fc,
         pattern = { "[/\\?]" },
-        callback = switch_insert_do,
+        callback = switch_cmd,
     })
     api.nvim_create_autocmd({ "CmdlineLeave" }, {
         group = fc,
         pattern = { "[/\\?]" },
-        callback = switch_normal_do,
+        callback = switch_normal_cmd,
     })
 end
 
