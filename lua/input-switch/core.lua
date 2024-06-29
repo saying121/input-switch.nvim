@@ -26,7 +26,7 @@ local function switch_normal_do()
     local no_en = is_no_en()
 
     local is_comment = vim.tbl_contains(vim.treesitter.get_captures_at_cursor(), "comment")
-    if no_en and is_comment then
+    if no_en and is_comment and config.enable_comment() then
         switch_to_en()
     elseif no_en then
         switch_to_en()
@@ -46,7 +46,7 @@ end
 
 local function switch_insert()
     local is_comment = vim.tbl_contains(vim.treesitter.get_captures_at_cursor(), "comment")
-    if is_comment then
+    if is_comment and config.enable_comment() then
         switch_not_en()
     elseif vim.b.insert_toggle_flag then
         switch_not_en()

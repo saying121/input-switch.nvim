@@ -1,7 +1,8 @@
 ---@class InputConf
 ---@field switch_to_en? string
 ---@field switch_no_en? string
----
+---@field comment? boolean
+
 local M = {}
 if os.getenv("SSH_TTY") ~= nil then
     return
